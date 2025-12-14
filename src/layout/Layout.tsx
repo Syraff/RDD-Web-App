@@ -1,4 +1,3 @@
-import api from "@/api/api";
 import { AppSidebar } from "@/components/sidebar/AppSidebar";
 import {
   Breadcrumb,
@@ -13,15 +12,15 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { useEffect, useState } from "react";
-import { Outlet, useLocation, useNavigate, useParams } from "react-router";
+import { useState } from "react";
+import { Outlet, useLocation, useParams } from "react-router";
 
 export default function Layout() {
   const { pathname } = useLocation();
   const { id } = useParams();
-  const [name, setName] = useState("");
-  const navigate = useNavigate();
-  const userId = localStorage.getItem("userId");
+  const [name] = useState("");
+  // const navigate = useNavigate();
+  // const userId = localStorage.getItem("userId");
 
   // const checkStatus = async () => {
   //   try {
