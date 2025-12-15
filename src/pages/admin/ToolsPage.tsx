@@ -24,9 +24,18 @@ export default function ToolsPage() {
 
       if (file) formData.append("file", file);
 
+      // const { data: res } = await axios.post(
+      //   "https://rdd-basic.zeabur.app/predict",
+      //   formData
+      // );
       const { data: res } = await axios.post(
-        "https://rdd-basic.zeabur.app/predict",
-        formData
+        "https://bp4mcfb41472sh.api.runpod.ai/predict",
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer rpa_IP0A4LS7YS0PC9LZ5ZECCI7QXETX2XVTMPPVUD1Jv5gw2a`,
+          },
+        }
       );
 
       res.countCrack = [
