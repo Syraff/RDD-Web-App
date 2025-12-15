@@ -30,30 +30,13 @@ export default function ToolsPage() {
       // );
       const { data: res } = await axios.post(
         import.meta.env.VITE_RUNPOD_ID + "predict",
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${import.meta.env.VITE_RUNPOD_API_KEY}`,
-          },
-        }
+        formData
+        // {
+        //   headers: {
+        //     Authorization: `Bearer ${import.meta.env.VITE_RUNPOD_API_KEY}`,
+        //   },
+        // }
       );
-
-      // const response = await fetch(
-      //   "https://bp4mcfb41472sh.api.runpod.ai/predict",
-      //   {
-      //     method: "POST",
-      //     headers: {
-      //       Authorization: `Bearer rpa_IP0A4LS7YS0PC9LZ5ZECCI7QXETX2XVTMPPVUD1Jv5gw2a`,
-      //     },
-      //     body: formData,
-      //   }
-      // );
-
-      // if (!response.ok) {
-      //   throw new Error(`HTTP error! status: ${response.status}`);
-      // }
-
-      // const res = await response.json();
 
       res.countCrack = [
         {
