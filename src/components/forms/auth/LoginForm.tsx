@@ -63,7 +63,6 @@ export default function LoginForm() {
           handleChange,
           handleBlur,
           handleSubmit,
-          isSubmitting,
           /* and other goodies */
         }) => (
           <form onSubmit={handleSubmit}>

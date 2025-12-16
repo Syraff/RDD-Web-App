@@ -17,7 +17,6 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import api from "@/api/api";
 import { toast } from "sonner";
 import { useNavigate } from "react-router";
 

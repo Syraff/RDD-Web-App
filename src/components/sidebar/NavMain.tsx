@@ -9,6 +9,7 @@ import {
   AccordionContent,
 } from "../ui/accordion";
 import { Link, useLocation } from "react-router";
+import type { TablerIcon } from "@tabler/icons-react";
 
 export function NavMain({
   items,
@@ -16,7 +17,7 @@ export function NavMain({
   items: {
     title: string;
     url: string;
-    icon: LucideIcon;
+    icon: LucideIcon | TablerIcon;
     level: string[];
     isActive?: boolean;
     items?: {
