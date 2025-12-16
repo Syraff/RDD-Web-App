@@ -3,6 +3,7 @@ import Login from "./pages/auth/Login";
 import Layout from "./layout/Layout";
 import MonitorPage from "./pages/admin/monitor/MonitorPage";
 import MonitorDetail from "./pages/admin/monitor/MonitorDetail";
+import DashboardDriver from "./pages/driver/DashboardDriver";
 
 export const router = createBrowserRouter([
   // {
@@ -47,14 +48,30 @@ export const router = createBrowserRouter([
       return null;
     },
     children: [
-      // Dashboard
       {
         path: "/monitor",
-        // element: <MonitorPage />,
+        loader: async () => {
+          const role = localStorage.getItem("role");
+          if (role === "driver") {
+            throw redirect("/dashboard");
+          }
+          return null;
+        },
         children: [
           { index: true, element: <MonitorPage /> },
           { path: ":id", element: <MonitorDetail /> },
         ],
+      },
+      {
+        path: "/dashboard",
+        loader: async () => {
+          const role = localStorage.getItem("role");
+          if (role !== "driver") {
+            throw redirect("/monitor");
+          }
+          return null;
+        },
+        children: [{ index: true, element: <DashboardDriver /> }],
       },
     ],
   },

@@ -19,8 +19,8 @@ export default function LoginForm() {
 
       localStorage.setItem("token", data.token);
       // localStorage.setItem("device_token", data.device_token);
-      // localStorage.setItem("role", data.role);
-      localStorage.setItem("name", data.user.email);
+      localStorage.setItem("role", data.user.roles);
+      localStorage.setItem("name", data.user.fullName);
       // localStorage.setItem("userId", data.userId);
       toast.success("Berhasil Login");
 

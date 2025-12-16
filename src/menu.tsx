@@ -7,13 +7,13 @@ export default function Menu() {
     {
       title: "Monitor",
       url: `/monitor`,
-      level: ["MONITOR"],
+      level: ["monitor"],
       icon: IconDeviceComputerCamera,
     },
     {
       title: "Dashboard",
       url: `/dashboard`,
-      level: ["DRIVER"],
+      level: ["driver"],
       icon: IconDashboard,
     },
     // {

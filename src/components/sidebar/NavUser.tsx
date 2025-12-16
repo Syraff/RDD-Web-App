@@ -74,7 +74,7 @@ export function NavUser({
                 <span className="truncate font-medium capitalize">
                   {user.name}
                 </span>
-                <span className="truncate text-xs">{user.role}</span>
+                <span className="truncate text-xs capitalize">{user.role}</span>
               </div>
               <ChevronsUpDown className="ml-auto size-4" />
             </SidebarMenuButton>
