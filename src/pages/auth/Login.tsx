@@ -5,7 +5,7 @@ import LoginForm from "@/components/forms/auth/LoginForm";
 export default function Login() {
   return (
     <>
-      <div className="grid grid-cols-6 bg-[#1a1a1a] text-[#fff] items-center h-screen">
+      <div className="grid grid-cols-6 bg-[#071123] text-[#fff] items-center h-screen">
         <div className="col-span-2 px-14">
           <div className="flex flex-col space-y-2 text-left mb-10">
             <div className="mb-16">

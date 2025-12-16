@@ -4,6 +4,7 @@ import "./index.css";
 import App from "./App.tsx";
 import { Provider } from "react-redux";
 import { store } from "./store/Store.ts";
+import "react-photo-view/dist/react-photo-view.css";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>

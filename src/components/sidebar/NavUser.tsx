@@ -35,7 +35,7 @@ export function NavUser({
 
   const handleLogout = async () => {
     try {
-      await api.get("/auth/logout");
+      // await api.get("/auth/logout");
       localStorage.clear();
       toast.success("Berhasil Logout");
       setTimeout(() => {

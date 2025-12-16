@@ -1,7 +1,8 @@
 import { createBrowserRouter, redirect } from "react-router";
 import Login from "./pages/auth/Login";
 import Layout from "./layout/Layout";
-import ToolsPage from "./pages/admin/ToolsPage";
+import MonitorPage from "./pages/admin/monitor/MonitorPage";
+import MonitorDetail from "./pages/admin/monitor/MonitorDetail";
 
 export const router = createBrowserRouter([
   // {
@@ -32,18 +33,28 @@ export const router = createBrowserRouter([
   {
     path: "/",
     element: <Layout />,
-    loader: async () => {
+    loader: async ({ request }) => {
       const token = localStorage.getItem("token");
+      const url = new URL(request.url);
+
       if (!token) {
         throw redirect("/login");
+      }
+
+      if (url.pathname === "/") {
+        throw redirect("/monitor");
       }
       return null;
     },
     children: [
       // Dashboard
       {
-        path: "/demo",
-        element: <ToolsPage />,
+        path: "/monitor",
+        // element: <MonitorPage />,
+        children: [
+          { index: true, element: <MonitorPage /> },
+          { path: ":id", element: <MonitorDetail /> },
+        ],
       },
     ],
   },
@@ -54,7 +65,7 @@ export const router = createBrowserRouter([
       const token = localStorage.getItem("token");
       // const role = localStorage.getItem("role");
       if (token) {
-        throw redirect("/demo");
+        throw redirect("/monitor");
       }
       return null;
     },

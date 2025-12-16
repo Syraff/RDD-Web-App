@@ -1,5 +1,6 @@
 import api from "@/api/api";
 import Input from "@/components/input/InputText";
+import { Spinner } from "@/components/ui/spinner";
 import { Formik } from "formik";
 import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
@@ -7,26 +8,30 @@ import { useNavigate } from "react-router";
 import { toast } from "sonner";
 
 export default function LoginForm() {
-  const [show, setShow] = useState(false);
+  const [show, setShow] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (val: any) => {
     try {
+      setIsLoading(true);
       const { data } = await api.post("/users/login", val);
 
       localStorage.setItem("token", data.token);
       // localStorage.setItem("device_token", data.device_token);
       // localStorage.setItem("role", data.role);
-      // localStorage.setItem("name", data.name);
+      localStorage.setItem("name", data.user.email);
       // localStorage.setItem("userId", data.userId);
       toast.success("Berhasil Login");
 
       setTimeout(() => {
-        navigate("/demo");
+        navigate("/monitor");
       }, 1000);
     } catch (errors: any) {
       toast.error(errors.response.data.errors[0].message);
       console.log(errors);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -86,17 +91,17 @@ export default function LoginForm() {
                     (errors.password && touched.password && errors.password
                       ? "border border-red-500"
                       : "") +
-                    " w-full bg-[#fff] px-3 py-3 text-[#1a1a1a] rounded"
+                    " w-full bg-[#fff] px-3 py-3 text-[#071123] rounded"
                   }
                 />
                 {!show ? (
                   <Eye
-                    className="absolute top-[25%] right-5 z-50 text-[#1a1a1a] cursor-pointer"
+                    className="absolute top-[25%] right-5 z-50 text-[#071123] cursor-pointer"
                     onClick={() => setShow(true)}
                   />
                 ) : (
                   <EyeOff
-                    className="absolute top-[25%] right-5 z-50 text-[#1a1a1a] cursor-pointer"
+                    className="absolute top-[25%] right-5 z-50 text-[#071123] cursor-pointer"
                     onClick={() => setShow(false)}
                   />
                 )}
@@ -107,10 +112,19 @@ export default function LoginForm() {
             </div>
             <button
               type="submit"
-              disabled={isSubmitting}
-              className="w-full py-3 text-center bg-[#fff] text-[#1a1a1a] rounded mt-10 cursor-pointer disabled:bg-[#fff]/50 font-semibold"
+              disabled={isLoading}
+              className={`w-full py-3 text-center text-[#071123] rounded mt-10 cursor-pointer font-semibold ${
+                isLoading ? "border-white border text-white" : "bg-white"
+              }`}
             >
-              Login
+              {isLoading ? (
+                <div className="flex items-center justify-center gap-x-2">
+                  <Spinner />
+                  <p className="font-semibold text-sm">Loading...</p>
+                </div>
+              ) : (
+                "Login"
+              )}
             </button>
           </form>
         )}

@@ -1,14 +1,20 @@
-import { MonitorCog } from "lucide-react";
+import { IconDashboard, IconDeviceComputerCamera } from "@tabler/icons-react";
 
 export default function Menu() {
   // const role = useSelector((state: RootState) => state.user.role);
 
   const Items = [
     {
-      title: "Demo",
-      url: `/demo`,
-      level: ["ADMIN"],
-      icon: MonitorCog,
+      title: "Monitor",
+      url: `/monitor`,
+      level: ["MONITOR"],
+      icon: IconDeviceComputerCamera,
+    },
+    {
+      title: "Dashboard",
+      url: `/dashboard`,
+      level: ["DRIVER"],
+      icon: IconDashboard,
     },
     // {
     //   title: "Settings",

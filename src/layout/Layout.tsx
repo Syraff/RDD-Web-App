@@ -18,7 +18,7 @@ import { Outlet, useLocation, useParams } from "react-router";
 export default function Layout() {
   const { pathname } = useLocation();
   const { id } = useParams();
-  const [name] = useState("");
+  const [name] = useState("421412");
   // const navigate = useNavigate();
   // const userId = localStorage.getItem("userId");
 

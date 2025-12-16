@@ -105,7 +105,7 @@ export default function ToolsPage() {
   return (
     <>
       {!predict ? (
-        <p className="text-3xl font-bold text-[#1a1a1a] mb-2">
+        <p className="text-3xl font-bold text-[#071123] mb-2">
           Lets Check Your Road 👋🏻
         </p>
       ) : (
@@ -230,7 +230,7 @@ export default function ToolsPage() {
             const uniqueClasses = Object.keys(classCounts);
             return (
               <div
-                className="p-3 py-4 border border-[#1a1a1a] rounded-sm"
+                className="p-3 py-4 border border-[#071123] rounded-sm"
                 key={i}
               >
                 <div className="mb-3">

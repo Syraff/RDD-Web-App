@@ -75,7 +75,7 @@ export default function InputFile({
 
   const FileIcon = () => (
     <svg
-      className="mx-auto text-[#1a1a1a]"
+      className="mx-auto text-[#071123]"
       width="40"
       height="40"
       viewBox="0 0 40 40"
@@ -95,7 +95,7 @@ export default function InputFile({
         className={`w-full relative min-h-[200px] p-4 bg-gray-50 rounded-xl border-2 border-dashed flex flex-col items-center justify-center transition duration-300 ${
           previewUrl
             ? "border-gray-400 bg-gray-50/30"
-            : "border-gray-200 hover:border-[#1a1a1a]"
+            : "border-gray-200 hover:border-[#071123]"
         }`}
       >
         {/* 1. IMAGE PREVIEW */}
@@ -129,10 +129,10 @@ export default function InputFile({
         {!previewUrl && (
           <div className="text-center p-6">
             <FileIcon />
-            <h2 className="text-sm font-semibold text-[#1a1a1a]">
+            <h2 className="text-sm font-semibold text-[#071123]">
               Drag and drop or select media
             </h2>
-            <p className="text-xs text-[#1a1a1a]/50 mt-1">
+            <p className="text-xs text-[#071123]/50 mt-1">
               Supports JPG, PNG, MP4, WebM (Max {MAX_SIZE_MB}MB)
             </p>
           </div>
@@ -151,10 +151,10 @@ export default function InputFile({
               onChange={handleFileChange}
             />
             <div
-              className={`flex items-center gap-2 px-4 py-2 bg-[#1a1a1a] hover:bg-[#1a1a1a]/90 text-white text-xs font-semibold rounded-full shadow transition-all transform group-hover:scale-105 active:scale-95 ${
+              className={`flex items-center gap-2 px-4 py-2 bg-[#071123] hover:bg-[#071123]/90 text-white text-xs font-semibold rounded-full shadow transition-all transform group-hover:scale-105 active:scale-95 ${
                 !disabled
-                  ? "bg-[#1a1a1a] hover:bg-[#1a1a1a]/90"
-                  : "bg-[#1a1a1a]/90"
+                  ? "bg-[#071123] hover:bg-[#071123]/90"
+                  : "bg-[#071123]/90"
               }`}
             >
               {previewUrl ? (

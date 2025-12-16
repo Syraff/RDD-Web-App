@@ -42,19 +42,18 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
 }
-
 :root {
   --radius: 0.625rem;
   --background: oklch(1 0 0);
-  --background-card: #112026;
+  --background-card: #235bc2;
   --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
+  --card: #1d4381;
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: #1a1a1a;
+  --primary: #1d3152;
   --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
+  --secondary: #0a1d3e;
   --secondary-foreground: oklch(0.205 0 0);
   --muted: oklch(0.97 0 0);
   --muted-foreground: oklch(0.556 0 0);
@@ -80,7 +79,7 @@
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
+  --background: #235bc2;
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.205 0 0);
   --card-foreground: oklch(0.985 0 0);
@@ -118,7 +117,7 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-primary;
   }
 }
 

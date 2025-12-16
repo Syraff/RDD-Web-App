@@ -20,7 +20,7 @@ export default function InputText({
         placeholder={placeholder}
         className={
           (errors ? "border border-red-500" : "") +
-          " w-full bg-[#fff] px-3 py-3 text-[#1a1a1a] rounded"
+          " w-full bg-[#fff] px-3 py-3 text-[#071123] rounded"
         }
       />
       <p className="text-red-400 text-xs mt-2">{errors}</p>
