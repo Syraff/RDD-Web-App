@@ -98,18 +98,15 @@ export default function DashboardDriver() {
             <div className="px-6 py-3 rounded-t-lg font-semibold border-b border-b-primary/50">
               Video Input
             </div>
-            <div className="p-3 flex justify-center items-center aspect-video">
-              {stream ? (
-                <video
-                  ref={videoRef}
-                  autoPlay
-                  playsInline
-                  //   muted // Mute local preview to avoid feedback loop
-                  className={`w-full rounded-lg h-full`}
-                />
-              ) : (
-                <p className="text-xl">{error || "No Source"}</p>
-              )}
+            <div className="p-3 flex justify-center items-center aspect-video rounded-lg overflow-hidden">
+              <video
+                ref={videoRef}
+                autoPlay
+                playsInline
+                //   muted // Mute local preview to avoid feedback loop
+                className={`w-full rounded-lg h-full ${!stream && "hidden"}`}
+              />
+              {!stream && <p className="text-xl">{error || "No Source"}</p>}
             </div>
           </div>
         </div>
