@@ -1,10 +1,4 @@
-import {
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-  type RefObject,
-} from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import SessionInformation from "../admin/monitor/section/SessionInformation";
 import { Pause, Play } from "lucide-react";
 import { IconCheckbox } from "@tabler/icons-react";
@@ -51,7 +45,7 @@ export default function DashboardDriver() {
     const constraints = {
       video: selectedVideoDevice
         ? {
-            deviceId: selectedVideoDevice,
+            deviceId: { exact: selectedVideoDevice },
             width: { ideal: 1280, max: 1920 },
             height: { ideal: 720, max: 1080 },
             frameRate: { ideal: 30 },
@@ -63,62 +57,19 @@ export default function DashboardDriver() {
     };
 
     try {
-      const mediaStream = await navigator.mediaDevices.getUserMedia({
-        video: true,
-      });
+      const mediaStream = await navigator.mediaDevices.getUserMedia(
+        constraints
+      );
       setStream(mediaStream);
 
       if (videoRef.current) {
         const video = videoRef.current;
         video.srcObject = mediaStream;
-
-        // ⭐ TAMBAHKAN EVENT LISTENERS ⭐
-        const handleLoadedMetadata = () => {
-          console.log("✅ Video metadata loaded");
-          console.log("Dimensions:", video.videoWidth, "x", video.videoHeight);
-
-          // Force play setelah metadata loaded
-          video
-            .play()
-            .then(() => console.log("🎬 Video playing successfully"))
-            .catch((err) => console.error("Play error:", err));
-        };
-
-        const handleCanPlay = () => {
-          console.log("✅ Video can play");
-        };
-
-        const handleError = (e: any) => {
-          console.error("❌ Video error:", e);
-        };
-
-        // Attach events
-        video.addEventListener("loadedmetadata", handleLoadedMetadata);
-        video.addEventListener("canplay", handleCanPlay);
-        video.addEventListener("error", handleError);
-
-        // Fallback: jika events tidak trigger
-        setTimeout(() => {
-          if (video.readyState >= 1) {
-            // HAVE_ENOUGH_DATA atau lebih
-            video.play().catch((e) => {
-              console.log("Auto-play blocked, trying muted...");
-              video.muted = true;
-              video.play();
-            });
-          }
-        }, 500);
-
-        // Cleanup function
-        return () => {
-          video.removeEventListener("loadedmetadata", handleLoadedMetadata);
-          video.removeEventListener("canplay", handleCanPlay);
-          video.removeEventListener("error", handleError);
-        };
       }
 
       console.log("MediaStream active:", mediaStream.active);
-      console.log("Video tracks:", mediaStream.getVideoTracks().length);
+      console.log("Video tracks:", mediaStream.getVideoTracks());
+      console.log(videoRef.current);
     } catch (err: any) {
       setError(`Gagal mengakses kamera/mikrofon: ${err.message}`);
     }
@@ -157,7 +108,7 @@ export default function DashboardDriver() {
                   className={`w-full rounded-lg h-full`}
                 />
               ) : (
-                <p className="text-xl">No Source</p>
+                <p className="text-xl">{error || "No Source"}</p>
               )}
             </div>
           </div>
