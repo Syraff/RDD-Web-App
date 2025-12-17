@@ -9,8 +9,6 @@ import SessionInformation from "../admin/monitor/section/SessionInformation";
 import { Pause, Play } from "lucide-react";
 import { IconCheckbox } from "@tabler/icons-react";
 import VideoDriver from "./section/VideoDriver";
-import { io } from "socket.io-client";
-import { toast } from "sonner";
 
 export default function DashboardDriver() {
   const [selectedVideoDevice, setSelectedVideoDevice] = useState<string>("");
@@ -106,7 +104,6 @@ export default function DashboardDriver() {
     getDevices();
   }, []);
 
-  const [connectionStatus, setConnectionStatus] = useState("Disconnected");
   const ws = useRef<any>(null);
 
   useEffect(() => {
@@ -132,7 +129,6 @@ export default function DashboardDriver() {
 
     ws.current.onerror = (error: any) => {
       console.error("WebSocket Error:", error);
-      setConnectionStatus("Error");
     };
 
     // ws.current.onclose = (event: any) => {
