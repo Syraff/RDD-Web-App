@@ -85,6 +85,8 @@ export default function DashboardDriver() {
     }
   };
 
+  const ws = useRef<any>(null);
+
   // Menghentikan Stream
   const stopStream = () => {
     if (stream) {
@@ -98,13 +100,12 @@ export default function DashboardDriver() {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
     }
+    if (ws) ws.current.close();
   };
 
   useEffect(() => {
     getDevices();
   }, []);
-
-  const ws = useRef<any>(null);
 
   useEffect(() => {
     // Inisialisasi WebSocket connection
@@ -112,71 +113,84 @@ export default function DashboardDriver() {
 
     // Cleanup pada unmount
     return () => {
-      if (ws.current) {
-        ws.current.close();
-      }
+      disconnectWebSocket();
     };
   }, []);
-
-  const connectWebSocket = () => {
-    const socketUrl = import.meta.env.VITE_RUNPOD_URL + "ws/broadcast/2";
-    ws.current = new WebSocket(socketUrl);
-
-    ws.current.onopen = () => {
-      console.log("WebSocket Connected");
-    };
-
-    ws.current.onerror = (error: any) => {
-      console.error("WebSocket Error:", error);
-    };
-
-    // ws.current.onclose = (event: any) => {
-    //   console.log("WebSocket Disconnected", event.code, event.reason);
-    //   setConnectionStatus("Disconnected");
-
-    //   // Reconnect setelah 3 detik
-    //   setTimeout(() => {
-    //     if (connectionStatus !== "Connected") {
-    //       console.log("Attempting to reconnect...");
-    //       connectWebSocket();
-    //     }
-    //   }, 3000);
-    // };
+  const disconnectWebSocket = () => {
+    if (ws.current) {
+      const state = ws.current.readyState;
+      if (state === WebSocket.OPEN || state === WebSocket.CONNECTING) {
+        ws.current.close(1000, "Manual disconnect");
+      }
+      ws.current = null;
+    }
   };
 
-  // // Buat koneksi socket
-  // const socket = io(import.meta.env.VITE_SOCKET_URL, {
-  //   transports: ["websocket", "polling"],
-  //   // withCredentials: true,
-  // });
+  const connectWebSocket = () => {
+    disconnectWebSocket();
 
-  // useEffect(() => {
-  //   // Event listeners
-  //   socket.on("connect", () => {
-  //     console.log("Connected:", socket.id);
-  //     socket.emit("register", { role: "driver" });
-  //   });
+    const socketUrl = import.meta.env.VITE_RUNPOD_URL + "ws/broadcast/3";
 
-  //   socket.on("disconnect", () => {
-  //     console.log("Disconnected");
-  //   });
+    try {
+      ws.current = new WebSocket(socketUrl);
 
-  //   socket.on("stream_video_backend", (data) => {
-  //     toast.success(data.message);
-  //   });
+      const connectionTimeout = setTimeout(() => {
+        if (ws.current?.readyState === WebSocket.CONNECTING) {
+          console.error("❌ WebSocket connection timeout");
+          ws.current.close(4000, "Connection timeout");
+        }
+      }, 10000);
 
-  //   // Cleanup on unmount
-  //   return () => {
-  //     socket.disconnect();
-  //   };
-  // }, []);
+      ws.current.onopen = () => {
+        clearTimeout(connectionTimeout);
+        console.log("✅ WebSocket Connected");
+      };
 
+      ws.current.onerror = (error: any) => {
+        clearTimeout(connectionTimeout);
+        console.error("❌ WebSocket Error:", error);
+      };
+
+      ws.current.onmessage = (event: MessageEvent) => {
+        try {
+          const data = JSON.parse(event.data);
+          console.log("📨 Received from server:", data);
+        } catch (error) {
+          console.log("Raw message from server:", event.data);
+        }
+      };
+
+      ws.current.onclose = (event: CloseEvent) => {
+        clearTimeout(connectionTimeout);
+        console.log("🔌 WebSocket closed:", {
+          code: event.code,
+          reason: event.reason,
+          wasClean: event.wasClean,
+        });
+
+        // Auto reconnect jika bukan normal closure
+        if (event.code !== 1000) {
+          console.log("🔄 Will attempt reconnect in 3 seconds...");
+          setTimeout(() => {
+            connectWebSocket();
+          }, 3000);
+        }
+      };
+    } catch (error) {
+      console.error("Failed to create WebSocket:", error);
+    }
+  };
+
+  // Ubah captureFrame untuk langsung mengirim ke WebSocket
   const captureFrame = () => {
     if (!videoRef.current || !canvasRef.current) return;
 
     const video = videoRef.current;
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
+
+    // Cek jika video sudah ready
+    if (video.videoWidth === 0 || video.videoHeight === 0) return;
 
     // Set canvas size sama dengan video
     canvas.width = video.videoWidth;
@@ -186,19 +200,23 @@ export default function DashboardDriver() {
     if (ctx) ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
     // Convert canvas ke base64
-    const base64 = canvas.toDataURL("image/jpeg", 100);
+    const base64 = canvas.toDataURL("image/jpeg", 0.8);
 
-    // socket.emit("stream_video", {
-    //   base64,
-    //   width: 1000,
-    //   height: 1000,
-    //   deviceId: "DI-DAFE21",
-    //   sessionId: "SSD-FAFEAF31",
-    // });
-    ws.current.send(base64);
-    return base64;
+    // Kirim ke WebSocket jika sudah connected
+    if (ws.current && ws.current.readyState === WebSocket.OPEN) {
+      try {
+        ws.current.send(base64); // Langsung kirim base64 string
+      } catch (error) {
+        console.error("Failed to send frame to WebSocket:", error);
+      }
+    }
   };
 
+  // Di startStream, tetap panggil interval:
+  intervalRef.current = setInterval(captureFrame, 50);
+
+  // Di stopStream, hapus baris ini:
+  // if (ws) ws.current.close();
   return (
     <>
       <div className="grid grid-cols-7 gap-5">

@@ -43,12 +43,12 @@ export default function MonitorDetail() {
   }, []);
 
   const connectWebSocket = () => {
-    const socketUrl = import.meta.env.VITE_RUNPOD_URL + "ws/watch/2";
+    const socketUrl = import.meta.env.VITE_RUNPOD_URL + "ws/watch/3";
     ws.current = new WebSocket(socketUrl);
 
-    ws.current.onopen = () => {
-      console.log("WebSocket Connected");
-    };
+    // ws.current.onopen = () => {
+    //   console.log("WebSocket Connected");
+    // };
 
     ws.current.onerror = (error: any) => {
       console.error("WebSocket Error:", error);
