@@ -36,22 +36,40 @@ export default function MonitorDetail() {
 
     // Cleanup pada unmount
     return () => {
-      if (ws.current) {
-        ws.current.close();
-      }
+      disconnectWebSocket();
     };
   }, []);
+  const disconnectWebSocket = () => {
+    if (ws.current) {
+      const state = ws.current.readyState;
+      if (state === WebSocket.OPEN || state === WebSocket.CONNECTING) {
+        ws.current.close(1000, "Manual disconnect");
+      }
+      ws.current = null;
+    }
+  };
 
   const connectWebSocket = () => {
+    disconnectWebSocket();
+
     const socketUrl = import.meta.env.VITE_RUNPOD_URL + "ws/watch/3";
     ws.current = new WebSocket(socketUrl);
 
-    // ws.current.onopen = () => {
-    //   console.log("WebSocket Connected");
-    // };
+    const connectionTimeout = setTimeout(() => {
+      if (ws.current?.readyState === WebSocket.CONNECTING) {
+        console.error("❌ WebSocket connection timeout");
+        ws.current.close(4000, "Connection timeout");
+      }
+    }, 10000);
+
+    ws.current.onopen = () => {
+      clearTimeout(connectionTimeout);
+      console.log("✅ WebSocket Connected");
+    };
 
     ws.current.onerror = (error: any) => {
-      console.error("WebSocket Error:", error);
+      clearTimeout(connectionTimeout);
+      console.error("❌ WebSocket Error:", error);
     };
 
     ws.current.onmessage = (event: any) => {
@@ -121,6 +139,23 @@ export default function MonitorDetail() {
             fps,
           };
         });
+      }
+    };
+
+    ws.current.onclose = (event: CloseEvent) => {
+      clearTimeout(connectionTimeout);
+      console.log("🔌 WebSocket closed:", {
+        code: event.code,
+        reason: event.reason,
+        wasClean: event.wasClean,
+      });
+
+      // Auto reconnect jika bukan normal closure
+      if (event.code !== 1000) {
+        console.log("🔄 Will attempt reconnect in 3 seconds...");
+        setTimeout(() => {
+          connectWebSocket();
+        }, 3000);
       }
     };
   };
