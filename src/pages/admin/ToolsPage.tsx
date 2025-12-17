@@ -40,15 +40,11 @@ export default function ToolsPage() {
 
       res.countCrack = [
         {
-          level: "Alligator Crack",
-          count: 0,
+          "Alligator Crack": 0,
+          "Longitudinal Crack": 0,
+          "Transverse Crack": 0,
+          Potholes: 0,
         },
-        {
-          level: "Longitudinal Crack",
-          count: 0,
-        },
-        { level: "Transverse Crack", count: 0 },
-        { level: "Potholes", count: 0 },
       ];
 
       if (res.metadata.type === "image") {

@@ -1,7 +1,16 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type RefObject,
+} from "react";
 import SessionInformation from "../admin/monitor/section/SessionInformation";
 import { Pause, Play } from "lucide-react";
 import { IconCheckbox } from "@tabler/icons-react";
+import VideoDriver from "./section/VideoDriver";
+import { io } from "socket.io-client";
+import { toast } from "sonner";
 
 export default function DashboardDriver() {
   const [selectedVideoDevice, setSelectedVideoDevice] = useState<string>("");
@@ -9,7 +18,9 @@ export default function DashboardDriver() {
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const getDevices = useCallback(async () => {
     try {
@@ -41,6 +52,10 @@ export default function DashboardDriver() {
   const startStream = async () => {
     stopStream(); // Hentikan stream sebelumnya jika ada
     setError(null);
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
 
     const constraints = {
       video: selectedVideoDevice
@@ -66,10 +81,7 @@ export default function DashboardDriver() {
         const video = videoRef.current;
         video.srcObject = mediaStream;
       }
-
-      console.log("MediaStream active:", mediaStream.active);
-      console.log("Video tracks:", mediaStream.getVideoTracks());
-      console.log(videoRef.current);
+      intervalRef.current = setInterval(captureFrame, 50);
     } catch (err: any) {
       setError(`Gagal mengakses kamera/mikrofon: ${err.message}`);
     }
@@ -84,31 +96,124 @@ export default function DashboardDriver() {
     if (videoRef.current) {
       videoRef.current.srcObject = null;
     }
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
   };
 
   useEffect(() => {
     getDevices();
   }, []);
 
+  const [connectionStatus, setConnectionStatus] = useState("Disconnected");
+  const ws = useRef<any>(null);
+
+  useEffect(() => {
+    // Inisialisasi WebSocket connection
+    connectWebSocket();
+
+    // Cleanup pada unmount
+    return () => {
+      if (ws.current) {
+        ws.current.close();
+      }
+    };
+  }, []);
+
+  const connectWebSocket = () => {
+    const socketUrl =
+      import.meta.env.VITE_RUNPOD_URL + "ws/broadcast/FWE-FEAFFDSRG";
+    ws.current = new WebSocket(socketUrl);
+
+    ws.current.onopen = () => {
+      console.log("WebSocket Connected");
+    };
+
+    ws.current.onerror = (error: any) => {
+      console.error("WebSocket Error:", error);
+      setConnectionStatus("Error");
+    };
+
+    // ws.current.onclose = (event: any) => {
+    //   console.log("WebSocket Disconnected", event.code, event.reason);
+    //   setConnectionStatus("Disconnected");
+
+    //   // Reconnect setelah 3 detik
+    //   setTimeout(() => {
+    //     if (connectionStatus !== "Connected") {
+    //       console.log("Attempting to reconnect...");
+    //       connectWebSocket();
+    //     }
+    //   }, 3000);
+    // };
+  };
+
+  // // Buat koneksi socket
+  // const socket = io(import.meta.env.VITE_SOCKET_URL, {
+  //   transports: ["websocket", "polling"],
+  //   // withCredentials: true,
+  // });
+
+  // useEffect(() => {
+  //   // Event listeners
+  //   socket.on("connect", () => {
+  //     console.log("Connected:", socket.id);
+  //     socket.emit("register", { role: "driver" });
+  //   });
+
+  //   socket.on("disconnect", () => {
+  //     console.log("Disconnected");
+  //   });
+
+  //   socket.on("stream_video_backend", (data) => {
+  //     toast.success(data.message);
+  //   });
+
+  //   // Cleanup on unmount
+  //   return () => {
+  //     socket.disconnect();
+  //   };
+  // }, []);
+
+  const captureFrame = () => {
+    if (!videoRef.current || !canvasRef.current) return;
+
+    const video = videoRef.current;
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext("2d");
+
+    // Set canvas size sama dengan video
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+
+    // Draw video frame ke canvas
+    if (ctx) ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    // Convert canvas ke base64
+    const base64 = canvas.toDataURL("image/jpeg", 100);
+
+    // socket.emit("stream_video", {
+    //   base64,
+    //   width: 1000,
+    //   height: 1000,
+    //   deviceId: "DI-DAFE21",
+    //   sessionId: "SSD-FAFEAF31",
+    // });
+    ws.current.send(base64);
+    return base64;
+  };
+
   return (
     <>
       <div className="grid grid-cols-7 gap-5">
         <div className="col-span-5">
-          <div className="border border-primary rounded-lg shadow-lg">
-            <div className="px-6 py-3 rounded-t-lg font-semibold border-b border-b-primary/50">
-              Video Input
-            </div>
-            <div className="p-3 flex justify-center items-center aspect-video rounded-lg overflow-hidden">
-              <video
-                ref={videoRef}
-                autoPlay
-                playsInline
-                //   muted // Mute local preview to avoid feedback loop
-                className={`w-full rounded-lg h-full ${!stream && "hidden"}`}
-              />
-              {!stream && <p className="text-xl">{error || "No Source"}</p>}
-            </div>
-          </div>
+          <VideoDriver
+            canvasRef={canvasRef as RefObject<HTMLCanvasElement>}
+            videoRef={videoRef as RefObject<HTMLVideoElement>}
+            stream={stream}
+            error={error}
+          />
         </div>
         <div className="col-span-2 flex flex-col gap-3">
           <div className="grid grid-cols-2 gap-3">
