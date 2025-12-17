@@ -43,7 +43,7 @@ export default function MonitorDetail() {
   }, []);
 
   const connectWebSocket = () => {
-    const socketUrl = import.meta.env.VITE_RUNPOD_URL + "ws/watch/1";
+    const socketUrl = import.meta.env.VITE_RUNPOD_URL + "ws/watch/2";
     ws.current = new WebSocket(socketUrl);
 
     ws.current.onopen = () => {

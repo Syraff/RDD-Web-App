@@ -119,8 +119,7 @@ export default function DashboardDriver() {
   }, []);
 
   const connectWebSocket = () => {
-    const socketUrl =
-      import.meta.env.VITE_RUNPOD_URL + "ws/broadcast/FWE-FEAFFDSRG";
+    const socketUrl = import.meta.env.VITE_RUNPOD_URL + "ws/broadcast/2";
     ws.current = new WebSocket(socketUrl);
 
     ws.current.onopen = () => {
